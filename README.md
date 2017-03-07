@@ -8,3 +8,4 @@ Infrastructure for data distribution network
 * Install Docker on Raspbian: sudo curl -sSL https://get.docker.com | sh
 * Download Raspbain image: sudo systemctl enable docker && docker run -ti resin/rpi-raspbian:jessie-20160831 /bin/bash
 * Install Docker on generic Linux: https://github.com/umiddelb/armhf/wiki/Get-Docker-up-and-running-on-the-RaspberryPi-(ARMv6)-in-four-steps-(Wheezy)
+* Configure DuckDNS to use our token and domain name & store logs in /var/log/duckdns dir
