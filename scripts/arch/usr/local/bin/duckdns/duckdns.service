@@ -1,0 +1,6 @@
+[Unit]
+Description=dynamic_dns_script
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/duckdns/duckdns.sh
