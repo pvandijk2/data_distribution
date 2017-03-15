@@ -1,0 +1,8 @@
+[Unit]
+Description=Run fstrim.service every day at 0100
+
+[Timer]
+OnCalendar=*-*-* 00:00:00
+
+[Install]
+WantedBy=multi-user.target

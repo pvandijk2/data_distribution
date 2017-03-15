@@ -1,0 +1,6 @@
+[Unit]
+Description=fstrim_sdcard_optimization
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/optimization/fstrim.sh
