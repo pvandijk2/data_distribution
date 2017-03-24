@@ -2,7 +2,7 @@
 sed -i 's/#Color/Color/' /etc/pacman.conf
 pacman -Sy --noconfirm sudo
 
-for arg in 'archlinux-keyring' 'pacman' 'ntp' 'slang' 'vim' 'filesystem' 'wget' 'base-devel' 'yajl'
+for arg in 'archlinux-keyring' 'pacman' 'ntp' 'slang' 'vim' 'filesystem' 'wget' 'base-devel' 'yajl' 'mosh'
 do
 	sudo pacman -Sy --noconfirm $arg
 	if [ $? -ne 0 ] 
