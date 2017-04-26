@@ -2,7 +2,7 @@
 sed -i 's/#Color/Color/' /etc/pacman.conf
 pacman -Sy --noconfirm sudo
 
-for arg in 'archlinux-keyring' 'pacman' 'ntp' 'slang' 'vim' 'filesystem' 'wget' 'base-devel' 'yajl' 'mosh'
+for arg in 'archlinux-keyring' 'pacman' 'ntp' 'slang' 'vim' 'filesystem' 'wget' 'base-devel' 'yajl' 'mosh' 'net-tools'
 do
 	sudo pacman -Sy --noconfirm $arg
 	if [ $? -ne 0 ] 
@@ -29,28 +29,3 @@ cd package-query && makepkg -si
 wget https://aur.archlinux.org/cgit/aur.git/snapshot/yaourt.tar.gz
 tar -xvzf yaourt.tar.gz
 cd yaourt && makepkg -si
-
-#ntp
-#package-query
-#--needed wget base-devel yajl
-#slang
-#sudo
-#vim
-#vi
-#filesystem --force
-#sed -i 's/#Color/Color/' /etc/pacman.conf
-#pacman -S filesystem --force
-#pacman -S yaourt
-#vim /etc/pacman.conf
-#vi /etc/pacman.conf
-#pacman -S yaourt
-#pacman -Sy pacman
-#vi /etc/pacman.conf
-#pacman -Sy pacman
-#pacman-key --init
-#pacman -S archlinux-keyring
-#pacman-key --populate archlinux
-#pacman -Syu --ignore filesystem
-#pacman -S wget
-#pacman -S newt
-#pacman -S vim
