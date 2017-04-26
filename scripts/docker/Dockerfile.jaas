@@ -1,4 +1,4 @@
 FROM stephank/archlinux:armv6-latest  
 RUN pacman -Syu --debug
-RUN pacman -Sy jenkins less vim ca-certificates grep procps mlocate atop inetutils pkgtools
+RUN pacman -Syu --no-confirm jenkins less vim ca-certificates grep procps mlocate atop inetutils pkgtools net-tools
 RUN java -jar /usr/share/java/jenkins/jenkins.war &> /tmp/jenkins.log
