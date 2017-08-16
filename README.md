@@ -1,6 +1,21 @@
 # data_distribution
 Infrastructure for data distribution network
 
+# Host setup using raspbian
+* Image raspbian minimal image to SD card and boot
+* Reserve an IP for the rpi MAC
+* Set up port forwarding of 22, 8080, 60000-61000 in the router to the rpi
+* Install applications: 
+'''apt-get install -y docker telnet vim mosh git'''
+* Add pi user to docker group: 
+'''sudo groupadd docker;sudo gpasswd -a $USER docker;newgrp docker'''
+* Create a jenkins docker image: 
+'''docker run -p 8080:8080 -p 50000:50000 -v jenkins:/var/jenkins_home wouterds/rpi-jenkins'''
+* TODO: clone this repo and start jenkins image as daemon (includes clone of jenkins settings)
+* TODO: Test connectivity to kenkins
+
+
+
 # Client Setup
 * Image SD with arch Linux image
 * Configure image to run ssh on boot and over USB (https://gist.github.com/gbaman/975e2db164b3ca2b51ae11e45e8fd40a)
