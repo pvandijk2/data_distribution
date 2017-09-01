@@ -6,7 +6,8 @@ Infrastructure for data distribution network
 * Reserve an IP for the rpi MAC
 * Set up port forwarding of 22, 8080, 60000-61000 in the router to the rpi
 * Install applications: 
-'''apt-get install -y docker telnet vim mosh git'''
+'''sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common docker-ce vim git'''
 * Add pi user to docker group: 
 '''sudo groupadd docker;sudo gpasswd -a $USER docker;newgrp docker'''
 * Create a jenkins docker image: 
