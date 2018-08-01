@@ -1,4 +1,4 @@
-import sys, os, shutil, fnmatch, gzip, time, xmltodict, subprocess, pprint
+import sys, os, shutil, fnmatch, gzip, time, xmltodict, subprocess, pprint, traceback, datetime
 
 date = sys.argv[1]
 date_match = date[:4] + "-" + date[4:6] + "-" + date[6:8]
@@ -44,22 +44,93 @@ for filename in os.listdir(dirname):
         with open(dirname + "/" + filename) as fd:
             for line in fd.readlines():
                 try:
-                    if '201807168711349' in line and 'WNCHSTR' in line:
+                    #if '201807168711349' in line and 'WNCHSTR' in line:
+
+                    if 'WATR' in line and 'WNCHSTR' in line and 'LateReason' in line:
                         doc = xmltodict.parse(line)
-                        if 'Pport' in doc and 'uR' in doc['Pport'] and 'schedule' in doc['Pport']['uR'] and '@rid' in doc['Pport']['uR']['schedule']:# and doc['Pport']['uR']['schedule']['@rid'] in rid: 
-                            print("Found RID: " + doc['Pport']['uR']['schedule']['@rid'])
+                        try:
+                            wat_expected_arrival = None
+                            wat_actual_arrival = None
+                            wat_expected_departure = None
+                            wat_actual_departure = None
 
-                        elif 'Pport' in doc and 'uR' in doc['Pport'] and 'TS' in doc['Pport']['uR'] and '@rid' in doc['Pport']['uR']['TS']:# and doc['Pport']['uR']['schedule']['@rid'] in rid: 
-                            print("Found RID: " + doc['Pport']['uR']['TS']['@rid'])
+                            win_expected_arrival = None
+                            win_actual_arrival = None
+                            win_expected_departure = None
+                            win_actual_departure = None
 
-                        elif 'Pport' in doc and 'uR' in doc['Pport'] and 'association' in doc['Pport']['uR'] and '@rid' in doc['Pport']['uR']['association']:# and doc['Pport']['uR']['schedule']['@rid'] in rid: 
-                            print("Found RID: " + doc['Pport']['uR']['association']['@rid'])
+                            for l in doc['Pport']['uR']['TS']['ns3:Location']:
+                                if isinstance(l, dict) and '@tpl' in l and l['@tpl'][:4] == 'WATR' and '@pta' in l:
+                                    actual_arrival = 0
+                                    offset = datetime.datetime.strptime('12:00', '%H:%M')
+                                    expected_arrival = datetime.datetime.strptime(l['@pta'], '%H:%M')
+                                    #expected_arrival = l['@pta']
 
-                        else:
-                            print("Line does not have rid:")
-                            pprint.pprint(doc)
+                                    if 'ns3:arr' in l and '@et' in l['ns3:arr']:
+                                        actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@et'], '%H:%M')
+                                        #print("Winchester time difference: " + str((actual_arrival  + offset) - (expected_arrival + offset)))
+                                        diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
+                                        print("Waterloo time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Arrival: " + str(actual_arrival.hour) + ":" + str(actual_arrival.minute) + " Expected Arrival: " + str(expected_arrival.hour) + ":" + str(expected_arrival.minute) )
+                                    elif 'ns3:arr' in l and '@at' in l['ns3:arr']:
+                                        actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@at'], '%H:%M')
+                                        diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
+                                        print("Waterloo time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Arrival: " + str(actual_arrival.hour) + ":" + str(actual_arrival.minute) + " Expected Arrival: " + str(expected_arrival.hour) + ":" + str(expected_arrival.minute) )
+
+                                if isinstance(l, dict) and '@tpl' in l and l['@tpl'] == 'WNCHSTR':
+                                    actual_arrival = 0
+                                    offset = datetime.datetime.strptime('12:00', '%H:%M')
+                                    expected_arrival = datetime.datetime.strptime(l['@pta'], '%H:%M')
+                                    #expected_arrival = l['@pta']
+
+                                    if 'ns3:arr' in l and '@et' in l['ns3:arr']:
+                                        actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@et'], '%H:%M')
+                                        #print("Winchester time difference: " + str((actual_arrival  + offset) - (expected_arrival + offset)))
+                                        diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
+                                        print("Winchester time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Arrival: " + str(actual_arrival.hour) + ":" + str(actual_arrival.minute) + " Expected Arrival: " + str(expected_arrival.hour) + ":" + str(expected_arrival.minute) )
+                                    elif 'ns3:arr' in l and '@at' in l['ns3:arr']:
+                                        actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@at'], '%H:%M')
+                                        diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
+                                        print("Winchester time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Arrival: " + str(actual_arrival.hour) + ":" + str(actual_arrival.minute) + " Expected Arrival: " + str(expected_arrival.hour) + ":" + str(expected_arrival.minute) )
+
+                                if isinstance(l, dict) and '@tpl' in l and l['@tpl'][:4] == 'WATR' and '@ptd' in l:
+                                    actual_depival = 0
+                                    offset = datetime.datetime.strptime('12:00', '%H:%M')
+                                    expected_depival = datetime.datetime.strptime(l['@ptd'], '%H:%M')
+                                    #expected_depival = l['@pta']
+
+                                    if 'ns3:dep' in l and '@et' in l['ns3:dep']:
+                                        actual_depival = datetime.datetime.strptime(l['ns3:dep']['@et'], '%H:%M')
+                                        #print("Waterloo time difference: " + str((actual_depival  + offset) - (expected_depival + offset)))
+                                        diff = ((actual_depival  + datetime.timedelta(hours=12)) - (expected_depival + datetime.timedelta(hours=12))) 
+                                        print("Waterloo time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Departure: " + str(actual_depival.hour) + ":" + str(actual_depival.minute) + " Expected Departure: " + str(expected_depival.hour) + ":" + str(expected_depival.minute) )
+                                    elif 'ns3:dep' in l and '@at' in l['ns3:dep']:
+                                        actual_depival = datetime.datetime.strptime(l['ns3:dep']['@at'], '%H:%M')
+                                        diff = ((actual_depival  + datetime.timedelta(hours=12)) - (expected_depival + datetime.timedelta(hours=12))) 
+                                        print("Waterloo time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Departure: " + str(actual_depival.hour) + ":" + str(actual_depival.minute) + " Expected Departure: " + str(expected_depival.hour) + ":" + str(expected_depival.minute) )
+                                          
+                        except Exception as e:
+                            print("Could not process line")
+                            pprint.pprint(doc)    
+                            traceback.print_exc(file=sys.stdout)
                             exit()
-                        pprint.pprint(doc)    
+
+                        #if 'Pport' in doc and 'uR' in doc['Pport'] and 'schedule' in doc['Pport']['uR'] and '@rid' in doc['Pport']['uR']['schedule'] and 'ns2:OR' in doc['Pport']['uR']['schedule'] and 'ns2:IP' in doc['Pport']['uR']['schedule'] and '@tpl' in doc['Pport']['uR']['schedule']['ns2:OR'] and doc['Pport']['uR']['schedule']['ns2:OR']['@tpl'][:4] == 'WATR':
+                        #    for j in doc['Pport']['uR']['schedule']['ns2:IP']:
+                        #        if '@tpl' in j and j['@tpl'] == 'WNCHSTR' and '@wta' in j and '@pta' in j:
+                        #            print("Predicted: " + j['@pta'] + " Actual: " + j['@wta'] + " Found RID and origin: " + doc['Pport']['uR']['schedule']['@rid']  )
+
+#0                        if 'Pport' in doc and 'uR' in doc['Pport'] and 'TS' in doc['Pport']['uR'] and '@rid' in doc['Pport']['uR']['TS']:# and doc['Pport']['uR']['schedule']['@rid'] in rid: 
+#0                            print("Found TS RID: " + doc['Pport']['uR']['TS']['@rid'])
+#0                            pprint.pprint(doc)    
+#
+#                        elif 'Pport' in doc and 'uR' in doc['Pport'] and 'association' in doc['Pport']['uR'] and '@rid' in doc['Pport']['uR']['association']:# and doc['Pport']['uR']['schedule']['@rid'] in rid: 
+#                            print("Found association RID: " + doc['Pport']['uR']['association']['@rid'])
+#
+#                        #else:
+                         #   print("Line does not have rid:")
+                         #   pprint.pprint(doc)
+                         #   exit()
+                        #pprint.pprint(doc)    
                 except Exception as e:
                     print("Could not process line: " + line)
                     print(e)
