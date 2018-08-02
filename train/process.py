@@ -1,5 +1,39 @@
 import sys, os, shutil, fnmatch, gzip, time, xmltodict, subprocess, pprint, traceback, datetime
 
+def get_arrival(l, station_name):
+    actual_arrival = None
+    diff = None
+    expected_arrival = None
+
+    if isinstance(l, dict) and '@tpl' in l and l['@tpl'][:4] == station_name and '@pta' in l:
+        expected_arrival = datetime.datetime.strptime(l['@pta'], '%H:%M')
+
+        if 'ns3:arr' in l and '@et' in l['ns3:arr']:
+            actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@et'], '%H:%M')
+            diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
+        elif 'ns3:arr' in l and '@at' in l['ns3:arr']:
+            actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@at'], '%H:%M')
+            diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
+
+    return expected_arrival, actual_arrival, diff 
+    
+def get_departure(l, station_name):
+    actual_departure = None
+    expectured_departure = None
+    diff = None
+
+    if isinstance(l, dict) and '@tpl' in l and l['@tpl'] == station_name and '@ptd' in l:
+        expected_departure = datetime.datetime.strptime(l['@ptd'], '%H:%M')
+
+        if 'ns3:dep' in l and '@et' in l['ns3:dep']:
+            actual_departure = datetime.datetime.strptime(l['ns3:dep']['@et'], '%H:%M')
+            diff = ((actual_departure  + datetime.timedelta(hours=12)) - (expected_departure + datetime.timedelta(hours=12))) 
+        elif 'ns3:dep' in l and '@at' in l['ns3:dep']:
+            actual_departure = datetime.datetime.strptime(l['ns3:dep']['@at'], '%H:%M')
+            diff = ((actual_departure  + datetime.timedelta(hours=12)) - (expected_departure + datetime.timedelta(hours=12))) 
+ 
+    return expected_departure, actual_departure, diff
+
 date = sys.argv[1]
 date_match = date[:4] + "-" + date[4:6] + "-" + date[6:8]
 dirname = "/home/pi/schedule/" + date_match
@@ -60,22 +94,25 @@ for filename in os.listdir(dirname):
                             win_actual_departure = None
 
                             for l in doc['Pport']['uR']['TS']['ns3:Location']:
-                                if isinstance(l, dict) and '@tpl' in l and l['@tpl'][:4] == 'WATR' and '@pta' in l:
-                                    actual_arrival = 0
-                                    offset = datetime.datetime.strptime('12:00', '%H:%M')
-                                    expected_arrival = datetime.datetime.strptime(l['@pta'], '%H:%M')
-                                    #expected_arrival = l['@pta']
-
-                                    if 'ns3:arr' in l and '@et' in l['ns3:arr']:
-                                        actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@et'], '%H:%M')
-                                        #print("Winchester time difference: " + str((actual_arrival  + offset) - (expected_arrival + offset)))
-                                        diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
-                                        print("Waterloo time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Arrival: " + str(actual_arrival.hour) + ":" + str(actual_arrival.minute) + " Expected Arrival: " + str(expected_arrival.hour) + ":" + str(expected_arrival.minute) )
-                                    elif 'ns3:arr' in l and '@at' in l['ns3:arr']:
-                                        actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@at'], '%H:%M')
-                                        diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
-                                        print("Waterloo time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Arrival: " + str(actual_arrival.hour) + ":" + str(actual_arrival.minute) + " Expected Arrival: " + str(expected_arrival.hour) + ":" + str(expected_arrival.minute) )
-
+                                win_expected_arrival, win_actual_arrival, diff = get_arrival(l, "WINCHSTR")
+                                if win_expected_arrival != None:
+                                    print("Winchester Expected Arrival: " + str(win_expected_arrival))
+#                                if isinstance(l, dict) and '@tpl' in l and l['@tpl'][:4] == 'WATR' and '@pta' in l:
+#                                    actual_arrival = 0
+#                                    offset = datetime.datetime.strptime('12:00', '%H:%M')
+#                                    expected_arrival = datetime.datetime.strptime(l['@pta'], '%H:%M')
+#                                    #expected_arrival = l['@pta']
+#
+#                                    if 'ns3:arr' in l and '@et' in l['ns3:arr']:
+#                                        actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@et'], '%H:%M')
+#                                        #print("Winchester time difference: " + str((actual_arrival  + offset) - (expected_arrival + offset)))
+#                                        diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
+#                                        print("Waterloo time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Arrival: " + str(actual_arrival.hour) + ":" + str(actual_arrival.minute) + " Expected Arrival: " + str(expected_arrival.hour) + ":" + str(expected_arrival.minute) )
+#                                    elif 'ns3:arr' in l and '@at' in l['ns3:arr']:
+#                                        actual_arrival = datetime.datetime.strptime(l['ns3:arr']['@at'], '%H:%M')
+#                                        diff = ((actual_arrival  + datetime.timedelta(hours=12)) - (expected_arrival + datetime.timedelta(hours=12))) 
+#                                        print("Waterloo time difference: " + str(diff.seconds//3600) + ":" + str((diff.seconds//60)%60) + " Actual Arrival: " + str(actual_arrival.hour) + ":" + str(actual_arrival.minute) + " Expected Arrival: " + str(expected_arrival.hour) + ":" + str(expected_arrival.minute) )
+#
                                 if isinstance(l, dict) and '@tpl' in l and l['@tpl'] == 'WNCHSTR':
                                     actual_arrival = 0
                                     offset = datetime.datetime.strptime('12:00', '%H:%M')
