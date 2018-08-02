@@ -94,9 +94,9 @@ for filename in os.listdir(dirname):
                             win_actual_departure = None
 
                             for l in doc['Pport']['uR']['TS']['ns3:Location']:
-                                win_expected_arrival, win_actual_arrival, diff = get_arrival(l, "WINCHSTR")
+                                win_expected_arrival, win_actual_arrival, diff = get_arrival(l, "WNCHSTR")
                                 if win_expected_arrival != None:
-                                    print("Winchester Expected Arrival: " + str(win_expected_arrival))
+                                    print("Winchester Expected Arrival: " + str(win_expected_arrival) + " actual arrival: " + str(win_actual_arrival) + " Time difference: " + str(diff))
 #                                if isinstance(l, dict) and '@tpl' in l and l['@tpl'][:4] == 'WATR' and '@pta' in l:
 #                                    actual_arrival = 0
 #                                    offset = datetime.datetime.strptime('12:00', '%H:%M')
